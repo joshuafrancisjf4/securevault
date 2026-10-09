@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptographic Recovery Architecture - SecureVault 2.0{% endblock %}
+
+{% block content %}
+<div class="card card-wide" style="max-width: 720px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">🛡️</div>
+        <h2>Zero-Knowledge Architecture & Recovery Limitations</h2>
+        <p class="subtitle">Why True AES-256-GCM Encryption Has No Secret Backdoors</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 18px; font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;">
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px;">
+            <h4 style="color: var(--cyan-primary); margin-bottom: 6px; font-size: 1rem;">1. Zero-Knowledge Key Derivation</h4>
+            <p>
+                In SecureVault 2.0, your master password is never stored anywhere on our servers in plaintext. When you enter your master password, it is passed through the <strong>scrypt key-derivation function (KDF)</strong> with a cryptographically random salt to derive a 256-bit AES encryption key directly in memory.
+            </p>
+        </div>
+
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px;">
+            <h4 style="color: var(--cyan-primary); margin-bottom: 6px; font-size: 1rem;">2. Why There is No "Reset Password" Backdoor</h4>
+            <p>
+                Many traditional apps offer a "Forgot Password" link that emails a reset link. However, in true client/vault cryptography, if the server could decrypt your files after resetting your password, it means the server had a master backdoor key or stored your plaintext keys all along.
+            </p>
+            <p style="margin-top: 8px;">
+                SecureVault 2.0 adheres strictly to genuine authenticated encryption: <strong>If you lose your master password, no administrator, engineer, or automated system can mathematically decrypt your files.</strong>
+            </p>
+        </div>
+
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 18px;">
+            <h4 style="color: var(--cyan-primary); margin-bottom: 6px; font-size: 1rem;">3. Recommended Safeguards & Best Practices</h4>
+            <ul style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                <li><strong>Password Manager:</strong> Store your vault master password in an offline or encrypted password manager (Bitwarden, 1Password, KeePass).</li>
+                <li><strong>2FA Emergency Codes:</strong> Download and print your 2FA backup recovery codes to ensure you are never locked out of your account login.</li>
+                <li><strong>Emergency Sheet:</strong> Keep a physically secured copy of your master credentials in a fireproof safe or safety deposit box.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 28px;">
+        <a href="{% if session.get('user_id') %}/dashboard{% else %}/login{% endif %}" class="btn" style="max-width: 240px; margin: 0 auto;">
+            Return to {% if session.get('user_id') %}Dashboard{% else %}Login{% endif %}
+        </a>
+    </div>
+</div>
+{% endblock %}

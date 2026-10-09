@@ -1,34 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "base.html" %}
 
-<title>SecureVault</title>
+{% block title %}Welcome to SecureVault 2.0{% endblock %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
+<div class="card card-wide" style="text-align: center; padding: 48px 36px;">
+    <div style="display: inline-block; width: 72px; height: 72px; background: radial-gradient(circle, rgba(0, 240, 255, 0.2), transparent 70%); border: 2px solid var(--cyan-primary); border-radius: 50%; line-height: 68px; font-size: 36px; margin-bottom: 18px; box-shadow: 0 0 25px var(--cyan-glow);">
+        🛡️
+    </div>
 
-</head>
+    <h1 style="font-size: 2.4rem; margin-bottom: 8px; background: linear-gradient(90deg, #00f0ff, #38bdf8, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        SecureVault 2.0
+    </h1>
+    <p class="subtitle" style="font-size: 1.1rem; max-width: 520px; margin: 0 auto 30px;">
+        Next-Generation Cryptographic Digital Vault with Authenticated AES-256-GCM Encryption, Smart Inactivity Lock, & Master Key Isolation.
+    </p>
 
-<body>
+    <!-- Feature Pillars Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 36px; text-align: left;">
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 12px;">
+            <div style="font-size: 24px; margin-bottom: 8px;">🔐</div>
+            <h4 style="color: var(--cyan-primary); font-size: 0.95rem; margin-bottom: 4px;">AES-256-GCM Encryption</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">True authenticated encryption with tamper-detection tags. Keys derived via scrypt KDF.</p>
+        </div>
 
-<div class="container">
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 12px;">
+            <div style="font-size: 24px; margin-bottom: 8px;">⏱️</div>
+            <h4 style="color: var(--cyan-primary); font-size: 0.95rem; margin-bottom: 4px;">Smart Vault Lock</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Automated inactivity detection & tab visibility defense with zero-plaintext memory wipe.</p>
+        </div>
 
-<h1>🔐 SecureVault</h1>
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); padding: 18px; border-radius: 12px;">
+            <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+            <h4 style="color: var(--cyan-primary); font-size: 0.95rem; margin-bottom: 4px;">Two-Factor Auth (2FA)</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">TOTP authenticator app integration with hashed single-use recovery backup codes.</p>
+        </div>
+    </div>
 
-<p>Your Personal Secure File Vault</p>
+    <!-- Action Buttons (Original Workflow Preserved) -->
+    <div style="display: flex; gap: 16px; justify-content: center; max-width: 380px; margin: 0 auto;">
+        <a href="/signup" class="btn" style="flex: 1;">Create Account</a>
+        <a href="/login" class="btn btn-secondary" style="flex: 1;">Login to Vault</a>
+    </div>
 
-<br>
-
-<a href="/signup">
-<button>Sign Up</button>
-</a>
-
-<br><br>
-
-<a href="/login">
-<button>Login</button>
-</a>
-
+    <div style="margin-top: 24px;">
+        <a href="/recovery-info" style="font-size: 0.85rem; color: var(--text-dim);">
+            Zero-Knowledge Architecture & Recovery Limitations &rarr;
+        </a>
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

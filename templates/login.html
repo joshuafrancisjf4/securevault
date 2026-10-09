@@ -1,25 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>SecureVault Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Authenticate - SecureVault 2.0{% endblock %}
+
+{% block content %}
 <div class="card">
-    <div class="icon">🔒</div>
-    <h2>SecureVault Login</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">🔐</div>
+        <h2>Vault Authentication</h2>
+        <p class="subtitle">Enter credentials to verify identity</p>
+    </div>
 
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Unlock Vault</button>
+    <form method="POST" id="loginForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required autofocus autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-with-action">
+                <input type="password" id="password" name="password" placeholder="Enter account password" required autocomplete="current-password">
+                <button type="button" class="input-action-btn" onclick="togglePasswordVisibility('password', this)" title="Show/Hide">🔒</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Authenticate & Unlock</button>
     </form>
 
-    <p style="text-align:center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-muted);">
         <a href="/signup">Create Account</a>
-    </p>
+        <a href="/recovery-info" style="color: var(--text-dim);">Forgot Password?</a>
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

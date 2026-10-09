@@ -1,31 +1,153 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vault</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="card">
-    <h2>Your Vault Files</h2>
+{% block title %}{{ vault.get('vault_name', 'Vault') }} - SecureVault 2.0{% endblock %}
 
-    <form action="/upload/{{ vault_id }}" method="POST" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <button type="submit">Upload File</button>
-    </form>
+{% block content %}
+<div class="card card-wide" id="vaultSensitiveContent">
 
-    <hr>
+    <!-- Vault Header HUD -->
+    <div class="vault-header-hud">
+        <div class="vault-title-group">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 28px;">🔓</span>
+                <h2 style="margin: 0;">{{ vault.get('vault_name', 'Confidential Vault') }}</h2>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <span class="hud-badge green">AES-256-GCM ACTIVE</span>
+                <span class="hud-badge">ZERO-PLAINTEXT DISK</span>
+            </div>
+        </div>
 
-    {% for file in files %}
-        <p>
-            {{ file }} <br>
-            <a href="/view/{{ vault_id }}/{{ file }}">View</a> |
-            <a href="/download/{{ vault_id }}/{{ file }}">Download</a> |
-            <a href="/delete/{{ vault_id }}/{{ file }}">Delete</a>
-        </p>
-    {% endfor %}
+        <div class="vault-badge-group">
+            <!-- Smart Lock Inactivity Countdown Widget (Feature 2) -->
+            <div class="smart-lock-indicator" title="Automatic lock engages upon inactivity">
+                <span class="countdown-pulse" id="smartLockPulse"></span>
+                <span>AUTO-LOCK IN: <strong id="smartLockCountdown" style="color: var(--cyan-primary);">05:00</strong></span>
+            </div>
 
+            <!-- Manual Lock Now Button -->
+            <a href="/lock_vault/{{ vault_id }}" id="manualLockBtn" data-vault-id="{{ vault_id }}" class="btn btn-sm btn-danger" style="width: auto;">
+                🔒 Lock Now
+            </a>
+        </div>
+    </div>
+
+    <!-- Upload Cyber Box (Feature 1) -->
+    <div class="upload-cyber-box">
+        <form action="/upload/{{ vault_id }}" method="POST" enctype="multipart/form-data" id="vaultUploadForm">
+            <div style="font-size: 36px; margin-bottom: 8px;">📤</div>
+            <h4 style="color: var(--cyan-primary); margin-bottom: 4px;">Encrypt & Store New Asset</h4>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">
+                Files are encrypted in-memory with AES-256-GCM using your scrypt-derived master key before writing to disk.
+            </p>
+
+            <div class="file-input-wrapper">
+                <label for="vaultFileInput" class="custom-file-label" id="fileChosenLabel">
+                    📁 Choose File to Encrypt
+                </label>
+                <input type="file" id="vaultFileInput" name="file" required onchange="handleFileSelected(this)">
+            </div>
+
+            <div style="max-width: 240px; margin: 0 auto;">
+                <button type="submit" class="btn btn-sm" id="uploadSubmitBtn">
+                    🛡️ Encrypt & Upload File
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Protected Files Inventory -->
+    <h3 style="font-size: 1.15rem; color: var(--cyan-primary); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <span>🔐 Encrypted Assets ({{ files|length }})</span>
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Authenticated AEAD Protected</span>
+    </h3>
+
+    {% if files %}
+        <div class="file-list-container">
+            {% for file_info in files %}
+                {% set filename = file_info.name if file_info is mapping else file_info %}
+                {% set filesize = file_info.size if file_info is mapping else '' %}
+                {% set is_enc = file_info.is_encrypted if file_info is mapping else True %}
+
+                <div class="file-item-card">
+                    <div class="file-info">
+                        <span class="file-type-icon">
+                            {% if filename.endswith(('.png', '.jpg', '.jpeg', '.webp', '.jfif', '.gif')) %}🖼️
+                            {% elif filename.endswith('.pdf') %}📄
+                            {% elif filename.endswith(('.c', '.py', '.js', '.html', '.css', '.json')) %}💻
+                            {% elif filename.endswith(('.zip', '.tar', '.gz', '.7z')) %}📦
+                            {% elif filename.endswith(('.docx', '.doc', '.xlsx', '.txt')) %}📝
+                            {% else %}📁{% endif %}
+                        </span>
+                        <div class="file-name-meta">
+                            <div class="file-title" title="{{ filename }}">{{ filename }}</div>
+                            <div class="file-meta-sub">
+                                <span style="color: var(--cyan-primary);">
+                                    {% if is_enc %}AES-256-GCM{% else %}Legacy (Plain){% endif %}
+                                </span>
+                                {% if filesize %}<span>{{ filesize }}</span>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-actions">
+                        <a href="/view/{{ vault_id }}/{{ filename }}" target="_blank" class="action-icon-btn" title="Decrypt and view in browser">
+                            👁️ View
+                        </a>
+                        <a href="/download/{{ vault_id }}/{{ filename }}" class="action-icon-btn" title="Decrypt and download file">
+                            ⬇️ Download
+                        </a>
+                        <a href="/delete/{{ vault_id }}/{{ filename }}" class="action-icon-btn delete-btn" onclick="return confirm('Permanently delete this encrypted file? This action is irreversible.');" title="Permanently delete">
+                            🗑️ Delete
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-vault-state">
+            <div class="icon">📂</div>
+            <h4>Vault is Currently Empty</h4>
+            <p style="font-size: 0.85rem; color: var(--text-dim);">Select a file above to encrypt with AES-256-GCM and store securely.</p>
+        </div>
+    {% endif %}
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <a href="/open_vault" class="back-btn" style="margin-top: 0;">⬅️ Back to Vaults</a>
+        <a href="/lock_vault/{{ vault_id }}" class="btn btn-secondary btn-sm danger" style="width: auto;">
+            🔒 Lock Vault
+        </a>
+    </div>
 </div>
+{% endblock %}
 
-</body>
-</html>
+{% block scripts %}
+<script>
+    function handleFileSelected(input) {
+        const label = document.getElementById('fileChosenLabel');
+        if (input.files && input.files[0]) {
+            label.textContent = `📄 Selected: ${input.files[0].name} (${(input.files[0].size / 1024).toFixed(1)} KB)`;
+            label.style.borderColor = 'var(--cyan-primary)';
+            label.style.color = 'var(--cyan-primary)';
+        }
+    }
+
+    // Initialize Smart Vault Lock (Feature 2)
+    document.addEventListener('DOMContentLoaded', () => {
+        const timeoutSeconds = {{ lock_timeout|default(300) }};
+        window.SmartVaultLock.init("{{ vault_id }}", timeoutSeconds);
+
+        const form = document.getElementById('vaultUploadForm');
+        if (form) {
+            form.addEventListener('submit', () => {
+                const btn = document.getElementById('uploadSubmitBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '⚡ Encrypting file & storing...';
+                }
+                window.showToast('Encrypting file with AES-256-GCM...', 'info');
+            });
+        }
+    });
+</script>
+{% endblock %}

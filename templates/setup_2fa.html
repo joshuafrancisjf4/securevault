@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Setup 2FA - SecureVault 2.0{% endblock %}
+
+{% block content %}
+<div class="card card-wide" style="max-width: 600px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">📱</div>
+        <h2>Enroll in Two-Factor Authentication</h2>
+        <p class="subtitle">Scan the QR code with Google Authenticator, Microsoft Authenticator, or Authy</p>
+    </div>
+
+    <!-- Step 1: QR Code -->
+    <div class="qr-code-box">
+        {{ qr_svg|safe }}
+    </div>
+
+    <!-- Manual Secret Key -->
+    <div style="background: rgba(10, 16, 32, 0.8); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px; text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Manual Setup Secret Key</div>
+        <div style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--cyan-primary); letter-spacing: 2px; word-break: break-all;" id="secretKeyText">
+            {{ secret }}
+        </div>
+    </div>
+
+    <!-- Step 2: Verification Form -->
+    <form method="POST" action="/settings/2fa/verify">
+        <input type="hidden" name="secret" value="{{ secret }}">
+
+        <div class="form-group">
+            <label for="code">Enter 6-Digit Verification Code</label>
+            <input type="text" id="code" name="code" placeholder="000000" maxlength="6" required autofocus autocomplete="off" style="text-align: center; font-size: 1.3rem; letter-spacing: 4px; font-family: var(--font-mono);">
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">
+                Verification ensures your authenticator app is synchronized before enabling protection.
+            </p>
+        </div>
+
+        <button type="submit" class="btn">
+            ✅ Verify & Activate Two-Factor Authentication
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="/settings" class="back-btn">⬅️ Cancel & Back to Settings</a>
+    </div>
+</div>
+{% endblock %}

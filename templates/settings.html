@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Security Settings - SecureVault 2.0{% endblock %}
+
+{% block content %}
+<div class="card card-wide">
+    <div class="vault-header-hud">
+        <div class="vault-title-group">
+            <h2 style="margin: 0; text-align: left;">Security & Authentication Settings</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">User: <strong style="color: var(--cyan-primary);">{{ user.get('username') }}</strong></p>
+        </div>
+        <div>
+            <a href="/dashboard" class="btn btn-secondary btn-sm">⬅️ Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Inactivity Timeout Preference (Feature 2) -->
+    <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <span style="font-size: 28px;">⏱️</span>
+            <div>
+                <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin: 0;">Smart Lock Inactivity Timeout</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    Select how quickly an unlocked vault automatically locks when idle.
+                </p>
+            </div>
+        </div>
+
+        <form method="POST" action="/api/update_timeout" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <select name="timeout" style="margin: 0;">
+                    <option value="30" {% if user.get('lock_timeout') == 30 %}selected{% endif %}>30 Seconds (Ultra-Strict)</option>
+                    <option value="60" {% if user.get('lock_timeout') == 60 %}selected{% endif %}>1 Minute (High Security)</option>
+                    <option value="300" {% if not user.get('lock_timeout') or user.get('lock_timeout') == 300 %}selected{% endif %}>5 Minutes (Balanced - Recommended)</option>
+                    <option value="600" {% if user.get('lock_timeout') == 600 %}selected{% endif %}>10 Minutes (Extended)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-sm" style="width: auto;">Save Timeout Preference</button>
+        </form>
+    </div>
+
+    <!-- Two-Factor Authentication (Feature 4) -->
+    <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 28px;">📱</span>
+                <div>
+                    <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin: 0;">Two-Factor Authentication (TOTP)</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                        Protect account logins with an authenticator app (Google Authenticator, Microsoft Authenticator, Authy).
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                {% if user.get('two_factor_enabled') %}
+                    <span class="hud-badge green" style="font-size: 0.85rem; padding: 6px 14px;">✅ 2FA ACTIVE</span>
+                {% else %}
+                    <span class="hud-badge" style="border-color: var(--amber-warning); color: var(--amber-warning); font-size: 0.85rem; padding: 6px 14px;">⚠️ 2FA DISABLED</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if user.get('two_factor_enabled') %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+                Your account requires a 6-digit TOTP code or a single-use backup code upon every login.
+                {% if user.get('two_factor_backup_codes') %}
+                    <br><strong>Remaining backup recovery codes:</strong> {{ user.get('two_factor_backup_codes')|length }}
+                {% endif %}
+            </p>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <form method="POST" action="/settings/2fa/disable" onsubmit="return confirm('Are you sure you want to disable Two-Factor Authentication? Your account will be less secure.');">
+                    <button type="submit" class="btn btn-sm btn-danger" style="width: auto;">Disable 2FA</button>
+                </form>
+                <a href="/settings/2fa/setup" class="btn btn-secondary btn-sm" style="width: auto;">Regenerate 2FA Secret & Codes</a>
+            </div>
+        {% else %}
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+                Enabling 2FA adds an essential second layer of cybersecurity. Even if someone discovers your password, they cannot breach your vault without your authenticator device.
+            </p>
+            <a href="/settings/2fa/setup" class="btn btn-sm" style="width: auto;">
+                🔐 Enroll in Two-Factor Authentication
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Security Information Card -->
+    <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+            <span style="font-size: 28px;">🛡️</span>
+            <div>
+                <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin: 0;">Zero-Knowledge Cryptographic Architecture</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                    Read about how encryption keys are isolated from the server.
+                </p>
+            </div>
+        </div>
+        <a href="/recovery-info" style="font-size: 0.85rem; color: var(--cyan-primary);">
+            View Zero-Knowledge Architecture & Recovery Limitations Documentation &rarr;
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,29 +1,64 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Vault</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="container">
-    <h2>🔐 Create Your Vault</h2>
+{% block title %}Create Vault - SecureVault 2.0{% endblock %}
 
-    <form method="POST" class="card">
-        <label>Vault Name</label>
-        <input type="text" name="vault_name" placeholder="Enter vault name" required>
+{% block content %}
+<div class="card">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">🛡️</div>
+        <h2>Create Encrypted Vault</h2>
+        <p class="subtitle">Set master password for AES-256-GCM file encryption</p>
+    </div>
 
-        <label>Password</label>
-        <input type="password" name="vault_password" placeholder="Enter password" required>
+    <form method="POST" id="createVaultForm">
+        <div class="form-group">
+            <label for="vault_name">Vault Name</label>
+            <input type="text" id="vault_name" name="vault_name" placeholder="e.g. Confidential Financials" required autofocus>
+        </div>
 
-        <label>Confirm Password</label>
-        <input type="password" name="confirm_password" placeholder="Confirm password" required>
+        <div class="form-group">
+            <label for="vault_password">Vault Master Password</label>
+            <div class="input-with-action">
+                <input type="password" id="vault_password" name="vault_password" placeholder="Create master password" required autocomplete="new-password">
+                <button type="button" class="input-action-btn" onclick="togglePasswordVisibility('vault_password', this)" title="Show/Hide">🔒</button>
+            </div>
 
-        <button type="submit">Create Vault</button>
+            <!-- Live Password Strength Meter -->
+            <div class="strength-meter-container">
+                <div class="strength-bar-bg">
+                    <div id="vaultStrengthFill" class="strength-bar-fill"></div>
+                </div>
+                <div class="strength-label-row">
+                    <span id="vaultStrengthLabel">Password Strength</span>
+                    <button type="button" onclick="openPasswordModal()" style="background: none; border: none; color: var(--cyan-primary); font-size: 0.75rem; cursor: pointer; padding: 0; width: auto; box-shadow: none;">⚡ Generate Strong</button>
+                </div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">
+                ⚠️ This master password derives your AES-256 encryption key. It is never stored in plaintext and cannot be recovered if forgotten.
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm Master Password</label>
+            <div class="input-with-action">
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter master password" required autocomplete="new-password">
+                <button type="button" class="input-action-btn" onclick="togglePasswordVisibility('confirm_password', this)" title="Show/Hide">🔒</button>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Initialize Encrypted Vault</button>
     </form>
 
-    <a href="/dashboard" class="back-btn">⬅ Back</a>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="/dashboard" class="back-btn">⬅️ Back to Dashboard</a>
+    </div>
 </div>
+{% endblock %}
 
-</body>
-</html>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initPasswordStrengthMeter('vault_password', 'vaultStrengthFill', 'vaultStrengthLabel');
+    });
+</script>
+{% endblock %}

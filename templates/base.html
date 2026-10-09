@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SecureVault 2.0{% endblock %} - Cyber File Protection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- Futuristic Cyber Navbar -->
+    <header class="cyber-navbar">
+        <a href="{% if session.get('user_id') %}/dashboard{% else %}/{% endif %}" class="brand-link">
+            <div class="brand-logo-icon">🛡️</div>
+            <div>
+                <span class="brand-title">SecureVault</span>
+                <span class="brand-badge">2.0 AES-GCM</span>
+            </div>
+        </a>
+
+        <nav class="nav-actions">
+            <!-- Password Generator Trigger Button (available everywhere) -->
+            <button type="button" class="nav-btn" onclick="openPasswordModal()" title="Open Smart Password Generator">
+                ⚡ PassGen
+            </button>
+
+            {% if session.get('user_id') %}
+                <a href="/dashboard" class="nav-btn">💻 Dashboard</a>
+                <a href="/open_vault" class="nav-btn">📂 Vaults</a>
+                <a href="/settings" class="nav-btn">⚙️ Settings</a>
+                <a href="/logout" class="nav-btn danger" title="Terminate Session">🔒 Logout</a>
+            {% else %}
+                <a href="/recovery-info" class="nav-btn" title="Learn about Zero-Knowledge Encryption">ℹ️ Security</a>
+                <a href="/login" class="nav-btn">Login</a>
+                <a href="/signup" class="nav-btn" style="background: rgba(0, 240, 255, 0.15); border-color: var(--cyan-primary);">Sign Up</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- Main Page Content -->
+    <main class="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container" style="max-width: 600px; margin-bottom: 20px;">
+                    {% for category, message in messages %}
+                        <div class="cyber-alert {{ category }}">
+                            <span>
+                                {% if category == 'error' %}⚠️
+                                {% elif category == 'success' %}✅
+                                {% else %}🛡️{% endif %}
+                            </span>
+                            <div>{{ message }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Password Generator Modal (Feature 5) -->
+    <div id="passwordGenModal" class="modal-backdrop">
+        <div class="modal-cyber-dialog">
+            <div class="modal-header">
+                <h3 style="color: var(--cyan-primary); display: flex; align-items: center; gap: 8px;">
+                    <span>⚡</span> Cryptographic Password Generator
+                </h3>
+                <button type="button" class="modal-close-btn" onclick="closePasswordModal()">&times;</button>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Generated locally using hardware-entropy RNG (<code style="color: var(--cyan-primary);">crypto.getRandomValues</code>). Never transmitted over network.
+            </p>
+
+            <div class="generator-result-box">
+                <span id="genDisplay" class="generator-display">••••••••••••••••</span>
+                <div class="generator-actions">
+                    <button type="button" id="genToggleMaskBtn" class="generator-icon-btn" title="Toggle Visibility">👁️</button>
+                    <button type="button" id="genRegenBtn" class="generator-icon-btn" title="Regenerate">🔄</button>
+                    <button type="button" id="genCopyBtn" class="generator-icon-btn" title="Copy to Clipboard">📋</button>
+                </div>
+            </div>
+
+            <!-- Password Strength Bar -->
+            <div class="strength-meter-container">
+                <div class="strength-bar-bg">
+                    <div id="genStrengthFill" class="strength-bar-fill score-3"></div>
+                </div>
+                <div class="strength-label-row">
+                    <span id="genStrengthLabel">Strong</span>
+                    <span id="genEntropyLabel" style="font-family: var(--font-mono);">78 bits entropy</span>
+                </div>
+            </div>
+
+            <!-- Generator Controls -->
+            <div class="control-row" style="margin-top: 18px;">
+                <label>Password Length: <span id="genLengthDisplay" class="length-badge">16</span> characters</label>
+                <div class="slider-group">
+                    <input type="range" id="genLengthSlider" min="8" max="64" value="16">
+                </div>
+            </div>
+
+            <div class="checkbox-options-grid">
+                <label class="cyber-checkbox-label">
+                    <input type="checkbox" id="genUpper" checked> Uppercase (A-Z)
+                </label>
+                <label class="cyber-checkbox-label">
+                    <input type="checkbox" id="genLower" checked> Lowercase (a-z)
+                </label>
+                <label class="cyber-checkbox-label">
+                    <input type="checkbox" id="genDigits" checked> Numbers (0-9)
+                </label>
+                <label class="cyber-checkbox-label">
+                    <input type="checkbox" id="genSymbols" checked> Symbols (!@#$...)
+                </label>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="button" id="genUsePasswordBtn" class="btn" style="flex: 1;">Use In Active Form</button>
+                <button type="button" class="btn btn-secondary" onclick="closePasswordModal()" style="width: auto;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='vault.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

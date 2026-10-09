@@ -1,29 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="card">
-    <div class="icon">🗄️</div>
-    <h2>Vault Dashboard</h2>
+{% block title %}Dashboard - SecureVault 2.0{% endblock %}
 
-    <form action="/create_vault">
-        <button>➕ Create Vault</button>
-    </form>
+{% block content %}
+<div class="card card-wide">
+    <div class="vault-header-hud">
+        <div class="vault-title-group">
+            <h2 style="margin: 0; text-align: left;">Cybersecurity Command Center</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">User: <strong style="color: var(--cyan-primary);">{{ user.get('username', 'Authenticated User') }}</strong></p>
+        </div>
+        <div class="vault-badge-group">
+            {% if user.get('two_factor_enabled') %}
+                <span class="hud-badge green">🔒 2FA ACTIVE</span>
+            {% else %}
+                <a href="/settings" class="hud-badge purple" style="text-decoration: none;">⚠️ 2FA DISABLED (ENABLE)</a>
+            {% endif %}
+            <span class="hud-badge">⏱️ TIMEOUT: {{ (user.get('lock_timeout', 300) / 60)|round(1) }} MIN</span>
+        </div>
+    </div>
 
-    <br>
+    <!-- Quick Action Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 28px; margin-bottom: 10px;">➕</div>
+                <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin-bottom: 6px;">Create New Vault</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Initialize an isolated encrypted partition with unique salt and master password.</p>
+            </div>
+            <a href="/create_vault" class="btn">Create Vault</a>
+        </div>
 
-    <form action="/open_vault">
-        <button>🔑 Open Vault</button>
-    </form>
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 28px; margin-bottom: 10px;">📂</div>
+                <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin-bottom: 6px;">Access Vaults</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Open, unlock, and manage your AES-256-GCM protected files.</p>
+            </div>
+            <a href="/open_vault" class="btn btn-secondary">Open Vaults</a>
+        </div>
 
-    <br>
+        <div style="background: rgba(10, 16, 32, 0.6); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 28px; margin-bottom: 10px;">⚙️</div>
+                <h3 style="font-size: 1.1rem; color: var(--cyan-primary); margin-bottom: 6px;">Security Settings</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Configure 2FA Authenticator, inactivity timeouts, and backup keys.</p>
+            </div>
+            <a href="/settings" class="btn btn-secondary">Manage Security</a>
+        </div>
+    </div>
 
-    <a href="/logout">🚪 Logout</a>
+    <!-- Bottom utility controls -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="openPasswordModal()">
+            ⚡ Open Password Generator
+        </button>
+        <a href="/logout" class="nav-btn danger" style="padding: 8px 16px;">
+            🔒 Secure Logout
+        </a>
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

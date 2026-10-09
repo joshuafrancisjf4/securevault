@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}2FA Backup Recovery Codes - SecureVault 2.0{% endblock %}
+
+{% block content %}
+<div class="card card-wide" style="max-width: 620px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--green-secure));">🎉</div>
+        <h2 style="color: var(--green-secure);">2FA Successfully Activated!</h2>
+        <p class="subtitle">Save these emergency backup recovery codes in a secure location</p>
+    </div>
+
+    <div class="cyber-alert warning">
+        <span>⚠️</span>
+        <div>
+            <strong>CRITICAL:</strong> These single-use backup recovery codes are your ONLY way to access your account if you lose your authenticator device. Each code can be used exactly once. They will not be displayed again.
+        </div>
+    </div>
+
+    <div class="backup-codes-grid">
+        {% for code in backup_codes %}
+            <div class="backup-code-item">{{ code }}</div>
+        {% endfor %}
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="copyAllBackupCodes()" style="flex: 1;">
+            📋 Copy All Codes
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()" style="flex: 1;">
+            🖨️ Print / Save PDF
+        </button>
+    </div>
+
+    <a href="/settings" class="btn">
+        I Have Saved My Recovery Codes &rarr;
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyAllBackupCodes() {
+        const codes = {{ backup_codes|tojson }};
+        const text = "SECUREVAULT 2.0 - EMERGENCY 2FA BACKUP CODES\n" +
+                     "Store safely in a password manager or offline safe.\n\n" +
+                     codes.join("\n");
+        navigator.clipboard.writeText(text).then(() => {
+            window.showToast('All backup recovery codes copied to clipboard!', 'success');
+        });
+    }
+</script>
+{% endblock %}

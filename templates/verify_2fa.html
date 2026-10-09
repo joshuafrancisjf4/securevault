@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Two-Factor Verification{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">📱</div>
+        <h2>Two-Factor Challenge</h2>
+        <p class="subtitle">Enter the 6-digit code from your authenticator app or an 8-character backup code</p>
+    </div>
+
+    <form method="POST" action="/verify-2fa">
+        <div class="form-group">
+            <label for="two_factor_code">Authenticator Code or Backup Code</label>
+            <input type="text" id="two_factor_code" name="two_factor_code" placeholder="e.g. 123456 or 4A9F-1B2C" required autofocus autocomplete="one-time-code" style="text-align: center; letter-spacing: 2px; font-family: var(--font-mono); font-size: 1.2rem;">
+        </div>
+
+        <button type="submit" class="btn">Verify Second Factor</button>
+    </form>
+
+    <div style="margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+        <p>Using a backup code will permanently consume that code.</p>
+        <p style="margin-top: 8px;"><a href="/logout">Cancel & Return to Login</a></p>
+    </div>
+</div>
+{% endblock %}

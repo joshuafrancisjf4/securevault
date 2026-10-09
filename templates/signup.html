@@ -1,25 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Create Secure Account{% endblock %}
+
+{% block content %}
 <div class="card">
-    <div class="icon">🔓</div>
-    <h2>Create Secure Account</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 42px; filter: drop-shadow(0 0 10px var(--cyan-primary));">🛡️</div>
+        <h2>Create Secure Account</h2>
+        <p class="subtitle">Initialize your personal encrypted security vault</p>
+    </div>
 
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
-        <button type="submit">Create Vault Account</button>
+    <form method="POST" id="signupForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Choose a username" required autofocus autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Account Password</label>
+            <div class="input-with-action">
+                <input type="password" id="password" name="password" placeholder="Create strong account password" required autocomplete="new-password">
+                <button type="button" class="input-action-btn" onclick="togglePasswordVisibility('password', this)" title="Show/Hide">🔒</button>
+            </div>
+
+            <!-- Live Password Strength Meter -->
+            <div class="strength-meter-container">
+                <div class="strength-bar-bg">
+                    <div id="signupStrengthFill" class="strength-bar-fill"></div>
+                </div>
+                <div class="strength-label-row">
+                    <span id="signupStrengthLabel">Password Strength</span>
+                    <button type="button" onclick="openPasswordModal()" style="background: none; border: none; color: var(--cyan-primary); font-size: 0.75rem; cursor: pointer; padding: 0; width: auto; box-shadow: none;">⚡ Suggest Strong</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Initialize Account</button>
     </form>
 
-    <p style="text-align:center;">
-        <a href="/login">Back to Login</a>
+    <p style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--text-muted);">
+        Already have an account? <a href="/login">Login to Vault</a>
     </p>
 </div>
+{% endblock %}
 
-</body>
-</html>
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initPasswordStrengthMeter('password', 'signupStrengthFill', 'signupStrengthLabel');
+    });
+</script>
+{% endblock %}

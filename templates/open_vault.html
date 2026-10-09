@@ -1,25 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Open Vault</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Your Vaults - SecureVault 2.0{% endblock %}
+
+{% block content %}
 <div class="container">
-    <h2>🔓 Your Vaults</h2>
-
-    <div class="vault-grid">
-        {% for vault in vaults %}
-            <div class="vault-card">
-                <h3>{{ vault['vault_name'] }}</h3>
-                <a href="/open_vault/{{ vault['_id'] }}">Open</a>
-            </div>
-        {% endfor %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h2 style="margin: 0; text-align: left;">Encrypted Vaults Repository</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">Select a vault and enter its master password to decrypt files</p>
+        </div>
+        <a href="/create_vault" class="btn btn-sm">➕ New Vault</a>
     </div>
 
-    <a href="/dashboard" class="back-btn">⬅ Back</a>
-</div>
+    <div class="vault-grid">
+        {% set vault_list = vaults|list %}
+        {% if vault_list %}
+            {% for vault in vault_list %}
+                {% set vid = vault['_id']|string %}
+                {% set is_unlocked = unlocked_ids and (vid in unlocked_ids) %}
+                <div class="vault-grid-card">
+                    <div>
+                        <div class="vault-grid-header">
+                            <span class="vault-grid-icon">{% if is_unlocked %}🔓{% else %}🔒{% endif %}</span>
+                            <span class="vault-grid-name">{{ vault['vault_name'] }}</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 16px;">
+                            <span class="hud-badge {% if is_unlocked %}green{% endif %}">
+                                {% if is_unlocked %}UNLOCKED{% else %}AES-256 LOCKED{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/open_vault/{{ vid }}" class="btn btn-sm" style="flex: 1;">
+                            {% if is_unlocked %}Access Files{% else %}Unlock Vault{% endif %}
+                        </a>
+                        {% if is_unlocked %}
+                            <a href="/lock_vault/{{ vid }}" class="btn btn-secondary btn-sm danger" title="Lock Vault Now">🔒</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card card-wide" style="text-align: center; grid-column: 1 / -1; padding: 40px 20px;">
+                <div style="font-size: 42px; margin-bottom: 10px;">📂</div>
+                <h3 style="color: var(--cyan-primary); margin-bottom: 8px;">No Vaults Initialized</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">You haven't created any encrypted vaults yet.</p>
+                <a href="/create_vault" class="btn" style="max-width: 200px; margin: 0 auto;">Create First Vault</a>
+            </div>
+        {% endif %}
+    </div>
 
-</body>
-</html>
+    <div style="margin-top: 24px;">
+        <a href="/dashboard" class="back-btn">⬅️ Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
